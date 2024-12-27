@@ -113,7 +113,7 @@ def getLineBoundaries(text_lblPath, idwriter):
     
     with open(text_lblPath, 'r') as rt:
         lbls = rt.read()
-    # rt.close()
+    rt.close()
     lbls = lbls.split('\n')
     sel = []
     if len(lbls[-1]) < 3:
@@ -125,45 +125,20 @@ def getLineBoundaries(text_lblPath, idwriter):
             sel.append(i)
     if len(sel) == 0:
         return None, None
-    # ic(sel)
-    # while True:pass
     data = split_todf(sel)
     ukey = data.line.unique().tolist()
     newLines = []
     for key in ukey:
-        # ic(key)
         dt = data[data.line == key]
         trans = ' '.join(dt['text'].tolist())
-    #     minX=0
-    #     maxX=0
-    #     minY=0
-    #     maxY=0
-    #     for id, word in enumerate(dt['bbox']):
-    #         word = list(map(int, word))
-    #         x = word[0]
-    #         y = word[1]
-    #         w = word[2]
-    #         h = word[3]
-
-    #         maxX = max(maxX,x+w)
-    #         minX = min(minX,x)
-    #         maxY = max(maxY,y+h)
-    #         minY = min(minY,y)
-
-    #     lines.append(([minY,maxY+1,minX,maxX+1],trans))
-    #     allHs+=1+maxY-minY
-    # meanH = allHs/len(lines)
         dt.loc[:,'bbox'] = dt['bbox'].apply(lambda x: ((x[0], x[1]),
                                                  (x[0]+x[2], x[1]),
                                                  (x[0], x[1]+x[3]),
                                                  (x[0]+x[2], x[1]+x[3])
                                                 ))
-        # print(type(dt))
         bboxs = dt['bbox'].tolist()
-        # ic(bboxs)
         nbboxs = np.array(bboxs, dtype=np.int32).reshape((-1, 1, 2))
         x, y, w, h = cv2.boundingRect(nbboxs)
-        # ic(x,y,w,h)
         lines.append(([ y, y + h, x, x + w], trans))
 
     meanH = allHs/len(lines)
@@ -175,8 +150,6 @@ def getLineBoundaries(text_lblPath, idwriter):
         bounds[2]-= meanH/4
         bounds[3]+= meanH/4
         bounds = [round(v) for v in bounds]
-        # ic(bounds)
-        # while True: pass
         newLines.append((bounds,trans))
     return newLines, writer
 
