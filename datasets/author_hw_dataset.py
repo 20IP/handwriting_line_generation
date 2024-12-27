@@ -411,12 +411,12 @@ class AuthorHWDataset(Dataset):
                 fg_mask = cv2.imread(fg_path,0)
                 fg_mask = fg_mask/255
                 if fg_mask.shape!=img[:,:].shape:
-                    print('Error, fg_mask ({}, {}) not the same size as image ({})'.format(fg_path,fg_mask.shape,img[:,:,0].shape))
+                    print('Error, fg_mask ({}, {}) not the same size as image ({}) Fixed!!'.format(fg_path,fg_mask.shape,img[:,:].shape))
                     th,fg_mask = cv2.threshold(img,0,255,cv2.THRESH_BINARY+cv2.THRESH_OTSU)
                     fg_mask = 255-fg_mask
                     ele = cv2.getStructuringElement(  cv2.MORPH_ELLIPSE, (9,9) )
                     fg_mask = cv2.dilate(fg_mask,ele)
-                    fg_mask = fg_mask/255
+                    fg_mask = fg_mask/255                    
             else:
                 fg_mask=None
 
