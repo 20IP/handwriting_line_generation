@@ -114,6 +114,7 @@ def collate(batch):
 
 class AuthorHWDataset(Dataset):
     def __init__(self, dirPath, split, config):
+        dirPath = '/home/dev/NanoJet/Generating_Handwritten/totals/'
         if 'split' in config:
             split = config['split']
 
@@ -142,6 +143,8 @@ class AuthorHWDataset(Dataset):
         self.author_list=set()
         for page_idx, name in enumerate(set_list):
             lines, author = parseDATA(dirPath, name)
+            if 'd01-060' in name:
+                ic(lines, author)
             if lines == None:
                 continue
             self.author_list.add(author)
@@ -155,7 +158,12 @@ class AuthorHWDataset(Dataset):
             self.max_char_len= max([self.max_char_len]+[len(l[1]) for l in lines])
             
             authorLines = len(self.authors[author])
+            # if 'd01-060' in name:
+            #     ic(authorLines)
+            #     self.authors[author] += [(os.path.join(dirPath,name+'.png'),)+l for l in lines]
+            #     ic(self.authors[author])
             self.authors[author] += [(os.path.join(dirPath,name+'.png'),)+l for l in lines]
+            
             #self.lineIndex += [(author,i+authorLines) for i in range(len(lines))]
         self.author_list = list(self.author_list)
         self.author_list.sort()

@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 import os
 import json
+from icecream import ic, install
+install()
 import logging
 import argparse
 import torch
@@ -23,7 +25,6 @@ import random, re, csv
 from icecream import ic
 #from datasets.forms_detect import FormsDetect
 #from datasets import forms_detect
-
 logging.basicConfig(level=logging.INFO, format='')
 
 data_loader= None
@@ -762,7 +763,6 @@ def main(resume,saveDir,gpu=None,config=None,addToConfig=None, fromDataset=True,
                     for i,instance2 in enumerate(data):
                         if i==index:
                             break
-                    ic(instance1)
                     author2 = instance2['author'][0]
                     print('author: {}'.format(author2))
                     image1 = instance1['image'].to(gpu)
@@ -961,14 +961,8 @@ if __name__ == '__main__':
             arguments[ss[0]]=ss[1]
     else:
         arguments=None
-    ic(addtoconfig)
-    ic(args.config)
-    ic(args.style_loc)
     if args.gpu is not None:
         with torch.cuda.device(args.gpu):
             main(args.checkpoint, args.savedir, gpu=args.gpu,  config=args.config, addToConfig=addtoconfig, test =args.test,arguments=arguments, style_loc=args.style_loc)
     else:
-        ic(addtoconfig)
-        ic(args.config)
-        ic(args.style_loc)
         main(args.checkpoint, args.savedir, gpu=args.gpu,  config=args.config, addToConfig=addtoconfig, test =args.test,arguments=arguments, style_loc=args.style_loc)

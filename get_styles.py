@@ -23,7 +23,6 @@ def main(resume,saveDir,index,gpu=None, shuffle=False, setBatch=None, config=Non
     assert(saveDir is not None)
     np.random.seed(1234)
     torch.manual_seed(1234)
-    ic(resume)
     if resume is not None:
         checkpoint = torch.load(resume, weights_only=True)
         print('loaded iteration {}'.format(checkpoint['iteration']))

@@ -110,7 +110,8 @@ def getLineBoundaries(text_lblPath, idwriter):
     lines=[]
     writer = idwriter
     allHs=0
-    
+    text_lblPath = '/home/dev/NanoJet/Generating_Handwritten/Data/IAM/words_new.txt'
+
     with open(text_lblPath, 'r') as rt:
         lbls = rt.read()
     rt.close()
@@ -273,13 +274,6 @@ def getWordAndLineIDs(xmlPath):
     return words,lines
 
 if __name__ == "__main__":
-    #imagePath = sys.argv[1]
-    #xmlPath = sys.argv[2]
-    #lines = getLines(imagePath,xmlPath)
-    #for i,(img, trans) in enumerate(lines):
-    #    print('{}: {}'.format(i,trans))
-    #    imageio.imsave('test/{}.png'.format(i),img)
-    #lineOut = sys.argv[1]
     wordOut = sys.argv[1]
     idIn = sys.argv[2]
     vocabIn = sys.argv[3]
@@ -293,43 +287,20 @@ if __name__ == "__main__":
         for line in f.readlines():
             w,i = line.split(',')
             valid_vocab.append(w)
-    #import pdb;pdb.set_trace()
-    #words=defaultdict(list)
     words=[]
     lines=[]
     for xmlPath in sys.argv[4:]:
         ws,ls = getWordAndLineIDs(xmlPath)
-        #words += ws
         lines += ls
         for id,trans,line_id in ws:
-            #if trans=='.':
-            #    import pdb;pdb.set_trace()
-            #words[trans].append(id)
             if trans in valid_vocab:# and line_id in valid_ids:
                 words.append(id)
                 if id=='p06-069-00-04':
                     import pdb;pdb.set_trace()
                     print('WHAT!?')
-            #else:
-            #    print('rejected {} {}'.format(id,trans))
-    #final_words = []
-    #for trans,ids in words.items():
-        #if len(ids)>20:
-
-        #    final_words+=ids
-    #words = final_words
-
 
     from random import shuffle
     shuffle(words)
-    #shuffle(lines)
-
-    #linesForTrain = int((4/6)*len(lines))
-    #linesForValid = int((5/6)*len(lines))
-    #linesTrain = lines[:linesForTrain]
-    #linesValid = lines[linesForTrain:linesForValid]
-    #linesTest = lines[linesForValid:]
-    #print('num lines train: {},  valid: {},  test:  {}'.format(len(linesTrain),len(linesValid),len(linesTest)))
 
     wordsForTrain = int(0.62*len(words))
     wordsForValid = int(0.7138*len(words))
