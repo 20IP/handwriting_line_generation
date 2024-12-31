@@ -405,15 +405,6 @@ class BaseTrainer:
         else:
             self.logger.info("Saved checkpoint: {} ...".format(filename))
 
-
-        ######DEBUG
-        #checkpoint = torch.load(filename)
-        #model_dict=self.model.state_dict()
-        #for name in checkpoint['state_dict']:
-            #if (checkpoint['state_dict'][name]!=model_dict[name]).any():
-                #        print('state not equal at: '+name)
-        #        import pdb; pdb.set_trace()
-
     def _resume_checkpoint(self, resume_path):
         """
         Resume from saved checkpoints
