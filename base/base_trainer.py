@@ -7,9 +7,9 @@ import logging
 import torch
 import torch.optim as optim
 import time
-from utils.util import ensure_dir
+from util import ensure_dir
 from collections import defaultdict
-from utils.curriculum import Curriculum
+from curriculum import Curriculum
 from model import *
 #from ..model import PairingGraph
 

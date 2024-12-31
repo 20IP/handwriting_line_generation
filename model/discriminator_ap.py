@@ -2,7 +2,7 @@ import torch.nn as nn
 from torch.nn import Parameter
 import torch
 import torch.nn.functional as F
-from utils.util import getGroupSize
+from util import getGroupSize
 
 def l2normalize(v, eps=1e-12):
     return v / (v.norm() + eps)

@@ -7,12 +7,14 @@ import signal
 import json
 import logging
 import argparse
-from model import *
 from model.loss import *
 from model.metric import *
-from data_loader.data_loaders import getDataLoader#, customDataloader
-from trainer import *
-from logger.logger import Logger
+from data_loaders import getDataLoader
+from model.hw_with_style import HWWithStyle
+from hw_with_style_trainer import HWWithStyleTrainer
+from auto_trainer import AutoTrainer
+from model.autoencoder import  Autoencoder
+from logger import Logger
 
 
 logging.basicConfig(level=logging.INFO, format='')

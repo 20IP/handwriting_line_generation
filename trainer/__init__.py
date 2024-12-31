@@ -1,2 +1,0 @@
-from trainer.hw_with_style_trainer import HWWithStyleTrainer
-from trainer.auto_trainer import AutoTrainer

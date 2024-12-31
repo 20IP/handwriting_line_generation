@@ -2,7 +2,7 @@
 
 import torch
 from torch import nn
-from utils.util import getGroupSize
+from util import getGroupSize
 
 class CNNOnlyHWR(nn.Module):
 
