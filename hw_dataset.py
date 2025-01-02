@@ -8,6 +8,7 @@ from collections import defaultdict
 import os
 import cv2
 import numpy as np
+import pandas as pd
 import math
 
 import grid_distortion
@@ -69,21 +70,17 @@ def collate(batch):
 class HWDataset(Dataset):
     def __init__(self, dirPath, split, config):
         self.img_height = config['img_height']
-
-        with open(os.path.join('data','sets.json')) as f:
-            set_list = json.load(f)[split]
-        f.close()
-            #  set_list = ['c06-138', 'b01-089', 'c01-066', 'e07-112',....]
+        data_df = pd.read_csv(os.path.join(dirPath, 'fake_data_lbls.csv'))
+        data_df = data_df[data_df['sets'] == split]
         self.authors = defaultdict(list)
         self.lineIndex = []
-        for page_idx, name in enumerate(set_list):
+        
+        for page_idx, name in enumerate(range(len(data_df))):
             lines, author = parseDATA(dirPath, name)
-            # print(lines)#temp
             if lines != None:
                 authorLines = len(self.authors[author])
                 self.authors[author] += [(os.path.join(dirPath, name+'.png'),)+l for l in lines]
                 self.lineIndex += [(author,i+authorLines) for i in range(len(lines))]
-        # print("----")#temp
         char_set_path = config['char_file']
         with open(char_set_path) as f:
             char_set = json.load(f)

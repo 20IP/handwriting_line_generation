@@ -103,55 +103,58 @@ def split_todf(list_val):
     data = data[data['status'] != 'err']
     return data
 # 
-def getLineBoundaries(text_lblPath, idwriter):
+def getLineBoundaries(data):
+    '''
+    Trả về tuple = ([(bbox1, text1), (bbox2, text2), ...], writer_id)
+    '''
     
-    text_lblPath = text_lblPath.replace('totals', 'words_new.txt')
-    lines=[]
-    writer = idwriter
-    allHs=0
-    text_lblPath = '/home/dev/NanoJet/Generating_Handwritten/Data/IAM/words_new.txt'
+    # text_lblPath = text_lblPath.replace('totals', 'words_new.txt')
+    # lines=[]
+    # writer = idwriter
+    # allHs=0
+    # text_lblPath = '/home/dev/NanoJet/Generating_Handwritten/Data/IAM/words_new.txt'
 
-    with open(text_lblPath, 'r') as rt:
-        lbls = rt.read()
-    rt.close()
-    lbls = lbls.split('\n')
-    sel = []
-    if len(lbls[-1]) < 3:
-        lbls = lbls[:-1]
+    # with open(text_lblPath, 'r') as rt:
+    #     lbls = rt.read()
+    # rt.close()
+    # lbls = lbls.split('\n')
+    # sel = []
+    # if len(lbls[-1]) < 3:
+    #     lbls = lbls[:-1]
         
-    for i in lbls:
-        j = '-'.join(i.split('-')[0:2])
-        if j in idwriter and len(j) == len(writer):
-            sel.append(i)
-    if len(sel) == 0:
-        return None, None
-    data = split_todf(sel)
-    ukey = data.line.unique().tolist()
-    newLines = []
-    for key in ukey:
-        dt = data[data.line == key]
-        trans = ' '.join(dt['text'].tolist())
-        dt.loc[:,'bbox'] = dt['bbox'].apply(lambda x: ((x[0], x[1]),
-                                                 (x[0]+x[2], x[1]),
-                                                 (x[0], x[1]+x[3]),
-                                                 (x[0]+x[2], x[1]+x[3])
-                                                ))
-        bboxs = dt['bbox'].tolist()
-        nbboxs = np.array(bboxs, dtype=np.int32).reshape((-1, 1, 2))
-        x, y, w, h = cv2.boundingRect(nbboxs)
-        lines.append(([ y, y + h, x, x + w], trans))
+    # for i in lbls:
+    #     j = '-'.join(i.split('-')[0:2])
+    #     if j in idwriter and len(j) == len(writer):
+    #         sel.append(i)
+    # if len(sel) == 0:
+        # return None, None
+    # data = split_todf(sel)
+    # ukey = data.line.unique().tolist()
+    # newLines = []
+    # for key in ukey:
+    #     dt = data[data.line == key]
+    #     trans = ' '.join(dt['text'].tolist())
+    #     dt.loc[:,'bbox'] = dt['bbox'].apply(lambda x: ((x[0], x[1]),
+    #                                              (x[0]+x[2], x[1]),
+    #                                              (x[0], x[1]+x[3]),
+    #                                              (x[0]+x[2], x[1]+x[3])
+    #                                             ))
+    #     bboxs = dt['bbox'].tolist()
+    #     nbboxs = np.array(bboxs, dtype=np.int32).reshape((-1, 1, 2))
+    #     x, y, w, h = cv2.boundingRect(nbboxs)
+    #     lines.append(([ y, y + h, x, x + w], trans))
 
-    meanH = allHs/len(lines)
-    for bounds,trans in lines:
-        diff = meanH-(bounds[1]-bounds[0])
-        if diff>0:
-            bounds[0]-=diff/2
-            bounds[1]+=diff/2
-        bounds[2]-= meanH/4
-        bounds[3]+= meanH/4
-        bounds = [round(v) for v in bounds]
-        newLines.append((bounds,trans))
-    return newLines, writer
+    # meanH = allHs/len(lines)
+    # for bounds,trans in lines:
+    #     diff = meanH-(bounds[1]-bounds[0])
+    #     if diff>0:
+    #         bounds[0]-=diff/2
+    #         bounds[1]+=diff/2
+    #     bounds[2]-= meanH/4
+    #     bounds[3]+= meanH/4
+    #     bounds = [round(v) for v in bounds]
+    #     newLines.append((bounds,trans))
+    # return newLines, writer
 
 def getLineBoundariesWithID(xmlPath):
     lines=[]

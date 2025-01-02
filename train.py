@@ -18,6 +18,10 @@ from logger import Logger
 
 
 logging.basicConfig(level=logging.INFO, format='')
+
+def _stop():
+    while True: pass
+    
 def set_procname(newname):
         from ctypes import cdll, byref, create_string_buffer
         newname=os.fsencode(newname)
@@ -28,12 +32,11 @@ def set_procname(newname):
 
 def main(config, resume):
     supercomputer = config['super_computer'] if 'super_computer' in config else False
-    # ic(supercomputer)
     train_logger = Logger()
-
-    split = config['split'] if 'split' in config else 'train'
-    data_loader, valid_data_loader = getDataLoader(config, split)
-    #valid_data_loader = data_loader.split_validation()
+    # _stop()
+    data_loader, test_data_loader, valid_data_loader = getDataLoader(config)
+    
+    _stop()
     model = eval(config['arch'])(config['model'])
     if 'style' in config['model'] and 'lookup' in config['model']['style']:
         model.style_extractor.add_authors(data_loader.dataset.authors) ##HERE

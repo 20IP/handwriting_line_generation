@@ -7,8 +7,7 @@
     "super_computer":false,
     "data_loader": {
         "data_set_name": "HWDataset",
-
-        "data_dir": "/home/datateam/projects/GEN_Handwritten/totals",
+        "data_dir": "/home/datateam/projects/GEN_Handwritten/data/Cyrillic/images",
         "batch_size": 16,
         "shuffle": true,
         "num_workers": 1,
@@ -23,9 +22,8 @@
         "batch_size": 12
     },
 
-    
+    "split": "train;valid",
     "lr_scheduler_type": "none",
- 
     "optimizer_type": "Adam",
     "optimizer": {
         "lr": 0.00001,
