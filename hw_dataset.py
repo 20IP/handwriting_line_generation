@@ -87,18 +87,18 @@ class HWDataset(Dataset):
 
                 if position != None:
                     authorLines = len(self.authors[key])
-                    self.authors[key] += [(os.path.join(dirPath, str(key), img_name), position, trans)]
-                    self.lineIndex += [(key,i+authorLines) for i in range(len(lines))]
-        # char_set_path = config['char_file']
-        # with open(char_set_path) as f:
-        #     char_set = json.load(f)
-        # self.char_to_idx = char_set['char_to_idx']
+                    self.authors[key] += [(os.path.join(dirPath, img_name), position, trans)]
+                    self.lineIndex += [(key,idx)]
+        char_set_path = config['char_file']
+        with open(char_set_path) as f:
+            char_set = json.load(f)
+        self.char_to_idx = char_set['char_to_idx']
 
-        # self.augmentation = config['augmentation'] if 'augmentation' in config else None
-        # self.normalized_dir = config['cache_normalized'] if 'cache_normalized' in config else None
-        # if self.normalized_dir is not None:
-        #     ensure_dir(self.normalized_dir)
-        # self.warning=False
+        self.augmentation = config['augmentation'] if 'augmentation' in config else None
+        self.normalized_dir = config['cache_normalized'] if 'cache_normalized' in config else None
+        if self.normalized_dir is not None:
+            ensure_dir(self.normalized_dir)
+        self.warning=False
 
         #DEBUG
         if 'overfit' in config and config['overfit']:

@@ -20,6 +20,7 @@ from logger import Logger
 logging.basicConfig(level=logging.INFO, format='')
 
 def _stop():
+    ic('>>>>> On Going Pass process!!!!!')
     while True: pass
     
 def set_procname(newname):
@@ -33,10 +34,10 @@ def set_procname(newname):
 def main(config, resume):
     supercomputer = config['super_computer'] if 'super_computer' in config else False
     train_logger = Logger()
+
+    data_loader, valid_data_loader = getDataLoader(config)
+    # ic(len(data_loader.dataset.authors))
     # _stop()
-    data_loader, test_data_loader, valid_data_loader = getDataLoader(config)
-    
-    _stop()
     model = eval(config['arch'])(config['model'])
     if 'style' in config['model'] and 'lookup' in config['model']['style']:
         model.style_extractor.add_authors(data_loader.dataset.authors) ##HERE
