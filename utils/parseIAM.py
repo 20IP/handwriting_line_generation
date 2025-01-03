@@ -110,7 +110,7 @@ def getLineBoundaries(text_lblPath, idwriter):
     lines=[]
     writer = idwriter
     allHs=0
-    text_lblPath = '/home/dev/NanoJet/Generating_Handwritten/Data/IAM/words_new.txt'
+    text_lblPath = '/home/datateam/projects/GEN_Handwritten/words_new.txt'
 
     with open(text_lblPath, 'r') as rt:
         lbls = rt.read()
