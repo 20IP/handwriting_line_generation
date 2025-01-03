@@ -110,11 +110,12 @@ class HWDataset(Dataset):
     def __getitem__(self, idx):
 
         author,line = self.lineIndex[idx]
-        # ic(self.lineIndex[idx]) # 'c02-082', 3)
+        ic(self.lineIndex[idx]) # 'c02-082', 3)
         img_path, lb, gt = self.authors[author][line]
-        # ic(img_path, lb, gt)
+        ic(img_path, lb, gt)
         if self.add_spaces:
             gt = ' '+gt+' '
+            print(3/0)
         if type(self.augmentation) is str and 'normalization' in  self.augmentation and self.normalized_dir is not None and os.path.exists(os.path.join(self.normalized_dir,'{}_{}.png'.format(author,line))):
             img = cv2.imread(os.path.join(self.normalized_dir,'{}_{}.png'.format(author,line)),0)
             readNorm=True
