@@ -87,7 +87,7 @@ class HWDataset(Dataset):
 
                 if position != None:
                     authorLines = len(self.authors[str(key)])
-                    self.authors[str(key)] += [(os.path.join(dirPath,'images', img_name), position, trans)]
+                    self.authors[str(key)] += [(os.path.join(dirPath,'images', img_name), position, str(trans))]
                     self.lineIndex += [(str(key),idx)]
         char_set_path = config['char_file']
         with open(char_set_path) as f:
