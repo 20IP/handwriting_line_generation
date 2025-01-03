@@ -143,8 +143,8 @@ class AuthorHWDataset(Dataset):
         self.author_list=set()
         for page_idx, name in enumerate(set_list):
             lines, author = parseDATA(dirPath, name)
-            if 'd01-060' in name:
-                ic(lines, author)
+            # if 'd01-060' in name:
+            #     ic(lines, author)
             if lines == None:
                 continue
             self.author_list.add(author)

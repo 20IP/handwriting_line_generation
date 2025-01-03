@@ -131,7 +131,7 @@ class HWWithStyleTrainer(BaseTrainer):
 
         self.use_char_set_disc = False
 
-        ic(config['trainer']['encoder_weights'])
+        # ic(config['trainer']['encoder_weights'])
 
         #Setup encoder for perceptual loss
         if 'encoder_weights' in config['trainer']:

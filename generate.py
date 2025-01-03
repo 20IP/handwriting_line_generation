@@ -349,8 +349,6 @@ def main(resume,saveDir,gpu=None,config=None,addToConfig=None, fromDataset=True,
                             genStep[-1,:]=0
                             genStep[:,0]=0
                             genStep[:,-1]=0
-                        ic(saveDir)
-                        ic(b,i)
                         path = os.path.join(saveDir,'gen{}_{}.png'.format(b,i))
                         #print('wrote: {}'.format(path))
                         cv2.imwrite(path,genStep)
