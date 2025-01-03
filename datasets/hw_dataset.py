@@ -82,8 +82,8 @@ class HWDataset(Dataset):
             if lines != None:
                 authorLines = len(self.authors[author])
                 self.authors[author] += [(os.path.join(dirPath, name+'.png'),)+l for l in lines]
-            ic(self.authors[author])
-                # self.lineIndex += [(author,i+authorLines) for i in range(len(lines))]
+                self.lineIndex += [(author,i+authorLines) for i in range(len(lines))]
+            ic(self.lineIndex)
         # print("----")#temp
         char_set_path = config['char_file']
         with open(char_set_path) as f:
