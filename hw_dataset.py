@@ -10,6 +10,7 @@ import cv2
 import numpy as np
 import pandas as pd
 import math
+import json
 
 import grid_distortion
 from util import ensure_dir
@@ -80,17 +81,14 @@ class HWDataset(Dataset):
             select_key_df = data_df[data_df['author'] == key]
             select_key_df.reset_index(inplace=True, drop=True)
             for idx in range(select_key_df.shape[0]):
-                position = select_key_df['pos'][idx]
+                position = json.loads(select_key_df['pos'][idx])
                 trans = select_key_df['lbl_img'][idx]
-                lines = (position, trans)
                 img_name = select_key_df['url_img'][idx]
-        # for _, name in enumerate(range(len(data_df))):
-        #     lines, author = parseDATA(dirPath, name)  # ([ y, y + h, x, x + w], trans), author
-                if lines != None:
+
+                if position != None:
                     authorLines = len(self.authors[key])
-                    self.authors[key] += [os.path.join(dirPath, img_name)]
-                ic(self.authors[key])
-                    # self.lineIndex += [(key,i+authorLines) for i in range(len(lines))]
+                    self.authors[key] += [(os.path.join(dirPath, str(key), img_name), position, trans)]
+                    self.lineIndex += [(key,i+authorLines) for i in range(len(lines))]
         # char_set_path = config['char_file']
         # with open(char_set_path) as f:
         #     char_set = json.load(f)
