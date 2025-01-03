@@ -86,9 +86,9 @@ class HWDataset(Dataset):
                 img_name = select_key_df['url_img'][idx]
 
                 if position != None:
-                    authorLines = len(self.authors[key])
-                    self.authors[key] += [(os.path.join(dirPath, img_name), position, trans)]
-                    self.lineIndex += [(key,idx)]
+                    authorLines = len(self.authors[str(key)])
+                    self.authors[str(key)] += [(os.path.join(dirPath,'images', img_name), position, trans)]
+                    self.lineIndex += [(str(key),idx)]
         char_set_path = config['char_file']
         with open(char_set_path) as f:
             char_set = json.load(f)
@@ -112,18 +112,19 @@ class HWDataset(Dataset):
         return len(self.lineIndex)
 
     def __getitem__(self, idx):
-
         author,line = self.lineIndex[idx]
-        # ic(self.lineIndex[idx]) # 'c02-082', 3)
+        ic(author,line)
+        ic(self.lineIndex[idx]) # 'c02-082', 3)
+        ic(self.authors[author][line])
         img_path, lb, gt = self.authors[author][line]
-        # ic(img_path, lb, gt)
+        ic(img_path, lb, gt)
         if self.add_spaces:
             gt = ' '+gt+' '
         if type(self.augmentation) is str and 'normalization' in  self.augmentation and self.normalized_dir is not None and os.path.exists(os.path.join(self.normalized_dir,'{}_{}.png'.format(author,line))):
             img = cv2.imread(os.path.join(self.normalized_dir,'{}_{}.png'.format(author,line)),0)
             readNorm=True
         else:
-            img = cv2.imread(img_path,0)[lb[0]:lb[1],lb[2]:lb[3]] #read as grayscale, crop line
+            img = cv2.imread(img_path,0)#[lb[0]:lb[1],lb[2]:lb[3]] #read as grayscale, crop line
             readNorm=False
 
         if img is None:
