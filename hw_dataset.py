@@ -74,23 +74,33 @@ class HWDataset(Dataset):
         data_df = data_df[data_df['sets'] == split]
         self.authors = defaultdict(list)
         self.lineIndex = []
-        
-        for page_idx, name in enumerate(range(len(data_df))):
-            lines, author = parseDATA(dirPath, name)
-            if lines != None:
-                authorLines = len(self.authors[author])
-                self.authors[author] += [(os.path.join(dirPath, name+'.png'),)+l for l in lines]
-                self.lineIndex += [(author,i+authorLines) for i in range(len(lines))]
-        char_set_path = config['char_file']
-        with open(char_set_path) as f:
-            char_set = json.load(f)
-        self.char_to_idx = char_set['char_to_idx']
 
-        self.augmentation = config['augmentation'] if 'augmentation' in config else None
-        self.normalized_dir = config['cache_normalized'] if 'cache_normalized' in config else None
-        if self.normalized_dir is not None:
-            ensure_dir(self.normalized_dir)
-        self.warning=False
+        unikey = data_df['author'].unique()
+        for key in unikey:
+            select_key_df = data_df[data_df['author'] == key]
+            select_key_df.reset_index(inplace=True, drop=True)
+            for idx in range(select_key_df.shape[0]):
+                position = select_key_df['pos'][idx]
+                trans = select_key_df['lbl_img'][idx]
+                lines = (position, trans)
+                img_name = select_key_df['url_img'][idx]
+        # for _, name in enumerate(range(len(data_df))):
+        #     lines, author = parseDATA(dirPath, name)  # ([ y, y + h, x, x + w], trans), author
+                if lines != None:
+                    authorLines = len(self.authors[key])
+                    self.authors[key] += [os.path.join(dirPath, img_name)]
+                ic(self.authors[key])
+                    # self.lineIndex += [(key,i+authorLines) for i in range(len(lines))]
+        # char_set_path = config['char_file']
+        # with open(char_set_path) as f:
+        #     char_set = json.load(f)
+        # self.char_to_idx = char_set['char_to_idx']
+
+        # self.augmentation = config['augmentation'] if 'augmentation' in config else None
+        # self.normalized_dir = config['cache_normalized'] if 'cache_normalized' in config else None
+        # if self.normalized_dir is not None:
+        #     ensure_dir(self.normalized_dir)
+        # self.warning=False
 
         #DEBUG
         if 'overfit' in config and config['overfit']:
