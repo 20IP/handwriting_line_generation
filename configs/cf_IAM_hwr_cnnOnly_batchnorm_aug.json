@@ -42,7 +42,7 @@
     "trainer": {
         "class": "HWWithStyleTrainer",
         "iterations": 100000,
-        "save_dir": "../saved_style_02/",
+        "save_dir": "../saved_style_01/",
         "val_step": 1000,
         "save_step": 500,
         "save_step_minor": 250,
