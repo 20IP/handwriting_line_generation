@@ -7,7 +7,7 @@
     "super_computer": false,
     "data_loader": {
         "data_set_name": "AuthorHWDataset",
-        "data_dir": "/home/datateam/projects/GEN_Handwritten/totals",
+        "data_dir": "/home/datateam/projects/GEN_Handwritten/data/Cyrillic/images",
         "batch_size": 28,
         "a_batch_size": 1,
         "shuffle": false,
@@ -16,6 +16,7 @@
         "max_width": 1300,
         "char_file": "./data/IAM_char_set.json"
     },
+    "split": "train;valid",
     "validation": {
         "shuffle": false,
         "batch_size": 64
@@ -43,7 +44,7 @@
     "trainer": {
         "class": "AutoTrainer",
         "iterations": 60000,
-        "save_dir": "saved/",
+        "save_dir": "saved_2/",
         "val_step": 5000,
         "save_step": 10000,
         "save_step_minor": 250,

@@ -221,6 +221,8 @@ class HWWithStyleTrainer(BaseTrainer):
 
             The metrics in log must have the key 'metrics'.
         """
+        # print(next(iter(iteration)))
+        # while True:pass
         self.model.train()
         if self.curriculum:
             lesson =  self.curriculum.getLesson(iteration)
@@ -240,7 +242,8 @@ class HWWithStyleTrainer(BaseTrainer):
             if any(['disc' in l for l in lesson]):
                 self.optimizer_discriminator.zero_grad()
 
-
+        # print('instance', instance)
+        # while True: pass
         if self.curriculum:
             #Do GAN training
             if all([l==0 for l in instance['label_lengths']]):

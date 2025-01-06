@@ -8,6 +8,7 @@ from torch.autograd import Variable
 from collections import defaultdict
 import os
 import cv2
+import pandas as pd
 import numpy as np
 import math
 
@@ -95,8 +96,6 @@ def collate(batch):
         "center_line": center_line_batch,
         "label": labels_batch,
         "style": style,
-        #"style": torch.cat([b['style'] for b in batch],dim=0),
-        #"label_lengths": [l for b in batch for l in b['label_lengths']],
         "label_lengths": torch.cat([b['label_lengths'] for b in batch],dim=0),
         "gt": [l for b in batch for l in b['gt']],
         "spaced_label": spaced_labels_batch,
@@ -114,15 +113,14 @@ def collate(batch):
 
 class AuthorHWDataset(Dataset):
     def __init__(self, dirPath, split, config):
-        dirPath = '/home/dev/NanoJet/Generating_Handwritten/totals/'
-        if 'split' in config:
-            split = config['split']
+        self.img_height = config['img_height']
+        data_df = pd.read_csv(os.path.join(dirPath, 'fake_data_lbls.csv'))
+        data_df = data_df[data_df['sets'] == split]
 
         self.img_height = config['img_height']
         self.batch_size = config['a_batch_size']
         self.no_spaces = config['no_spaces'] if 'no_spaces' in config else False
         self.max_width = config['max_width'] if  'max_width' in config else 3000
-        #assert(config['batch_size']==1)
         self.warning=False
 
         self.triplet = config['triplet'] if 'triplet' in config else False
@@ -133,18 +131,12 @@ class AuthorHWDataset(Dataset):
         only_author = config['only_author'] if 'only_author' in config else None
         skip_author = config['skip_author'] if 'skip_author' in config else None
 
-        #with open(os.path.join(dirPath,'sets.json')) as f:
-        with open(os.path.join('data','sets.json')) as f:
-            set_list = json.load(f)[split]
-
         self.authors = defaultdict(list)
         self.lineIndex = []
         self.max_char_len=0
         self.author_list=set()
         for page_idx, name in enumerate(set_list):
             lines, author = parseDATA(dirPath, name)
-            if 'd01-060' in name:
-                ic(lines, author)
             if lines == None:
                 continue
             self.author_list.add(author)
@@ -158,27 +150,12 @@ class AuthorHWDataset(Dataset):
             self.max_char_len= max([self.max_char_len]+[len(l[1]) for l in lines])
             
             authorLines = len(self.authors[author])
-            # if 'd01-060' in name:
-            #     ic(authorLines)
-            #     self.authors[author] += [(os.path.join(dirPath,name+'.png'),)+l for l in lines]
-            #     ic(self.authors[author])
             self.authors[author] += [(os.path.join(dirPath,name+'.png'),)+l for l in lines]
             
-            #self.lineIndex += [(author,i+authorLines) for i in range(len(lines))]
         self.author_list = list(self.author_list)
         self.author_list.sort()
-        #minLines=99999
-        #for author,lines in self.authors.items():
-            #print('{} {}'.format(author,len(lines)))
-            #minLines = min(minLines,len(lines))
-        #maxCombs = int(nCr(minLines,self.batch_size)*1.2)
         short = config['short'] if 'short' in config else False
         for author,lines in self.authors.items():
-            #if split=='train':
-            #    combs=list(itertools.combinations(list(range(len(lines))),self.batch_size))
-            #    np.random.shuffle(combs)
-            #    self.lineIndex += [(author,c) for c in combs[:maxCombs]]
-            #else:
             for i in range(len(lines)//self.batch_size):
                 ls=[]
                 for n in range(self.batch_size):

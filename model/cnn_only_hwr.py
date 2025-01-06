@@ -97,7 +97,8 @@ class CNNOnlyHWR(nn.Module):
 
 
     def forward(self, input_cn, style=None):
-        ic(input_cn.shape)
+        # ic(input_cn.shape)
+        # while True:pass
         if self.pad is not None:
             input_cn=self.pad(input_cn)
         # ic(input_cn.shape)

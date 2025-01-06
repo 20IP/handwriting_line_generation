@@ -8,7 +8,7 @@
     "data_loader": {
         "data_set_name": "HWDataset",
         "data_dir": "/home/datateam/projects/GEN_Handwritten/data/Cyrillic/images",
-        "batch_size": 1,
+        "batch_size": 12,
         "shuffle": true,
         "num_workers": 1,
 
@@ -44,7 +44,7 @@
         "iterations": 100000,
         "save_dir": "../saved/",
         "val_step": 1000,
-        "save_step": 5,
+        "save_step": 10000,
         "save_step_minor": 250,
         "log_step": 100,
         "verbosity": 1,
