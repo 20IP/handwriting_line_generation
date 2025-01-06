@@ -44,7 +44,7 @@
     "trainer": {
         "class": "AutoTrainer",
         "iterations": 60000,
-        "save_dir": "saved_style_02/",
+        "save_dir": "../saved_style_02/",
         "val_step": 5000,
         "save_step": 10000,
         "save_step_minor": 250,
