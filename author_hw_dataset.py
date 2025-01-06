@@ -135,25 +135,32 @@ class AuthorHWDataset(Dataset):
         self.lineIndex = []
         self.max_char_len=0
         self.author_list=set()
-        for page_idx, name in enumerate(set_list):
-            lines, author = parseDATA(dirPath, name)
-            if lines == None:
-                continue
-            self.author_list.add(author)
-            if only_author is not None and type(only_author) is int and page_idx==only_author:
-                only_author=author
-                print('Only author: {}'.format(only_author))
-            if only_author is not None and author!=only_author:
-                continue
-            if skip_author is not None and author==skip_author:
-                continue
-            self.max_char_len= max([self.max_char_len]+[len(l[1]) for l in lines])
+        
+        unikey = data_df['author'].unique()
+        for page_idx, key in enumerate(unikey):
+            select_key_df = data_df[data_df['author'] == key]
+            select_key_df.reset_index(inplace=True, drop=True)
+            for idx in range(select_key_df.shape[0]):
+                position = json.loads(select_key_df['pos'][idx])        # position rectangle
+                trans = select_key_df['lbl_img'][idx]                   # text labels
+                img_name = select_key_df['url_img'][idx]                # image name, author = key
             
-            authorLines = len(self.authors[author])
-            self.authors[author] += [(os.path.join(dirPath,name+'.png'),)+l for l in lines]
+            self.author_list.add(str(key))
+            if only_author is not None and type(only_author) is int and page_idx==only_author:
+                only_author=str(key)
+                print('Only author: {}'.format(only_author))
+            if only_author is not None and str(key)!=only_author:
+                continue
+            if skip_author is not None and str(key)==skip_author:
+                continue
+            self.max_char_len= max([self.max_char_len]+[len(str(trans))])
+            
+            authorLines = len(self.authors[str(key)])
+            self.authors[str(key)] += [(os.path.join(dirPath,'images', img_name), position, str(trans))]
             
         self.author_list = list(self.author_list)
         self.author_list.sort()
+        
         short = config['short'] if 'short' in config else False
         for author,lines in self.authors.items():
             for i in range(len(lines)//self.batch_size):
@@ -368,7 +375,7 @@ class AuthorHWDataset(Dataset):
             if img.shape[0] != self.img_height:
                 if img.shape[0] < self.img_height and not self.warning:
                     self.warning = True
-                    print("WARNING: upsampling image to fit size")
+                    # print("WARNING: upsampling image to fit size")
                 percent = float(self.img_height) / img.shape[0]
                 if img.shape[1]*percent > self.max_width:
                     percent = self.max_width/img.shape[1]

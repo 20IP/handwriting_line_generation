@@ -19,7 +19,14 @@
     "split": "train;valid",
     "validation": {
         "shuffle": false,
-        "batch_size": 64
+        "batch_size": 64,
+        "data_set_name": "AuthorHWDataset",
+        "data_dir": "/home/datateam/projects/GEN_Handwritten/data/Cyrillic/images",
+        "a_batch_size": 1,
+        "num_workers": 1,
+        "img_height": 64,
+        "max_width": 1300,
+        "char_file": "./data/IAM_char_set.json"
     },
     "optimizer_type": "Adam",
     "optimizer": {
@@ -38,8 +45,7 @@
         "auto": 1,
         "recog": 1
     },
-    "loss_params": {
-    },
+    "loss_params": {},
     "metrics": [],
     "trainer": {
         "class": "AutoTrainer",
