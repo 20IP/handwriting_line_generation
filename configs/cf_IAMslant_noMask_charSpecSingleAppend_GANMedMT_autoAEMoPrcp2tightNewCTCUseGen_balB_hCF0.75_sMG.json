@@ -8,23 +8,24 @@
     "data_loader": {
         "data_set_name": "AuthorHWDataset",
 
-        "data_dir": "/home/datateam/projects/GEN_Handwritten/totals",
+        "data_dir": "../data/Cyrillic/images",
         "batch_size": 2,
         "a_batch_size": 2,
         "shuffle": true,
-        "num_workers": 2,
+        "num_workers": 1,
 
         "img_height": 64,
         "max_width": 1300,
         "char_file": "./data/IAM_char_set.json",
         "mask_post": ["thresh","dilateCircle","errodeCircle"],
         "mask_random": false,
-        "fg_masks_dir": "../data/IAM/fg_masks",
+        "fg_masks_dir": "../data/Cyrillic/mask",
         "augmentation": "affine"
     },
+    "split": "train;valid",
     "validation": {
         "shuffle": false,
-        "batch_size": 4,
+        "batch_size": 2,
         "a_batch_size": 2,
         "augmentation": null
     },
@@ -104,14 +105,14 @@
         "use_learning_schedule": false,
         "no_bg_loss": true,
 
-        "encoder_weights": "../saved_style_2/IAM_auto_2tight_newCTC/checkpoint-iteration60000.pth",
+        "encoder_weights": "../saved_style_02/IAM_auto_2tight_newCTC/checkpoint-iteration60000.pth",
         "encoder_type": "2tight",
 
         "print_dir": "train_out/IAMslant_noMask_charSpecSingleAppend_GANMedMT_autoAEMoPrcp2tightNewCTCUseGen_balB_hCF0.75_sMG",
         "serperate_print_every": 5000,
         "print_every": 250
     },
-    "arch": "HWWithStyle", 
+    "arch": "HWWithStyle",
     "model": {
         "num_class": 80,
         "generator": "PureGen",
@@ -119,7 +120,7 @@
         "gen_dim": 256,
         "gen_use_skips": true,
 	"hwr": "CNNOnly batchnorm",
-        "pretrained_hwr": "../saved_style_1/IAM_hwr_cnnOnly_batchnorm_aug/checkpoint-iteration100000.pth",
+        "pretrained_hwr": "../saved_style_01/IAM_hwr_cnnOnly_batchnorm_aug/checkpoint-iteration8500.pth",
         "hwr_frozen": true,
         "count_std": 0.00000001,
         "dup_std": 0.000000001,
