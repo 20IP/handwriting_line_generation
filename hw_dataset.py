@@ -70,9 +70,10 @@ def collate(batch):
 
 class HWDataset(Dataset):
     def __init__(self, dirPath, split, config):
+        ic(split)
         self.img_height = config['img_height']
-        data_df = pd.read_csv(os.path.join(dirPath, 'fake_data_lbls.csv'))
-        data_df = data_df[data_df['sets'] == split]
+        data_df = pd.read_csv(os.path.join(dirPath, 'hwt_style.csv'), sep='\t')
+        data_df = data_df[data_df['setID'] == split]
         self.authors = defaultdict(list)
         self.lineIndex = []
 
@@ -82,14 +83,15 @@ class HWDataset(Dataset):
             select_key_df.reset_index(inplace=True, drop=True)
             for idx in range(select_key_df.shape[0]):
                 position = json.loads(select_key_df['pos'][idx])
-                trans = select_key_df['lbl_img'][idx]
-                img_name = select_key_df['url_img'][idx]
+                trans = select_key_df['lbls'][idx]
+                img_name = select_key_df['image'][idx]
 
                 if position != None:
                     authorLines = len(self.authors[str(key)])
-                    self.authors[str(key)] += [(os.path.join(dirPath,'images', img_name), position, str(trans))]
+                    self.authors[str(key)] += [(os.path.join(dirPath, img_name), position, str(trans))]
                     self.lineIndex += [(str(key),idx)]
-                    
+        
+        
         char_set_path = config['char_file']
         with open(char_set_path) as f:
             char_set = json.load(f)

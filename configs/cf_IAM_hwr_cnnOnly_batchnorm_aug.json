@@ -7,14 +7,14 @@
     "super_computer":false,
     "data_loader": {
         "data_set_name": "HWDataset",
-        "data_dir": "/home/datateam/projects/GEN_Handwritten/data/Cyrillic/images",
+        "data_dir": "/home/datateam/projects/GEN_Handwritten/data/Cyrillic",
         "batch_size": 12,
         "shuffle": true,
         "num_workers": 1,
 
         "augmentation": false,
         "img_height": 64,
-        "char_file": "./data/IAM_char_set.json",
+        "char_file": "./data/Cyrillic_char_set.json",
         "center_pad": false
     },
     "validation": {
@@ -22,7 +22,7 @@
         "batch_size": 12
     },
 
-    "split": "train;valid",
+    "split": "train;valid;test",
     "lr_scheduler_type": "none",
     "optimizer_type": "Adam",
     "optimizer": {
@@ -43,8 +43,8 @@
         "class": "HWWithStyleTrainer",
         "iterations": 100000,
         "save_dir": "../saved_style_01/",
-        "val_step": 1000,
-        "save_step": 500,
+        "val_step": 10000,
+        "save_step": 5000,
         "save_step_minor": 250,
         "log_step": 100,
         "verbosity": 1,
@@ -57,7 +57,7 @@
     },
     "arch": "HWWithStyle", 
     "model": {
-        "num_class": 80,
+        "num_class": 112,
         "hwr": "CNNOnly batchnorm",
         "generator": "none",
         "style": "none"
