@@ -113,9 +113,10 @@ def collate(batch):
 
 class AuthorHWDataset(Dataset):
     def __init__(self, dirPath, split, config):
+        ic(split)
         self.img_height = config['img_height']
-        data_df = pd.read_csv(os.path.join(dirPath, 'fake_data_lbls.csv'))
-        data_df = data_df[data_df['sets'] == split]
+        data_df = pd.read_csv(os.path.join(dirPath, 'hwt_style.csv'), sep='\t')
+        data_df = data_df[data_df['setID'] == split]
 
         self.img_height = config['img_height']
         self.batch_size = config['a_batch_size']
@@ -140,24 +141,25 @@ class AuthorHWDataset(Dataset):
         for page_idx, key in enumerate(unikey):
             select_key_df = data_df[data_df['author'] == key]
             select_key_df.reset_index(inplace=True, drop=True)
+            # ic(select_key_df.shape)
             for idx in range(select_key_df.shape[0]):
                 position = json.loads(select_key_df['pos'][idx])        # position rectangle
-                trans = select_key_df['lbl_img'][idx]                   # text labels
-                img_name = select_key_df['url_img'][idx]                # image name, author = key
+                trans = select_key_df['lbls'][idx]                      # text labels
+                img_name = select_key_df['image'][idx]                  # image name, author = key
             
-            self.author_list.add(str(key))
-            if only_author is not None and type(only_author) is int and page_idx==only_author:
-                only_author=str(key)
-                print('Only author: {}'.format(only_author))
-            if only_author is not None and str(key)!=only_author:
-                continue
-            if skip_author is not None and str(key)==skip_author:
-                continue
-            self.max_char_len= max([self.max_char_len]+[len(str(trans))])
-            
-            authorLines = len(self.authors[str(key)])
-            self.authors[str(key)] += [(os.path.join(dirPath,'images', img_name), position, str(trans))]
-            
+                self.author_list.add(str(key))
+                if only_author is not None and type(only_author) is int and page_idx==only_author:
+                    only_author=str(key)
+                    print('Only author: {}'.format(only_author))
+                if only_author is not None and str(key)!=only_author:
+                    continue
+                if skip_author is not None and str(key)==skip_author:
+                    continue
+                self.max_char_len= max([self.max_char_len]+[len(str(trans))])
+                
+                authorLines = len(self.authors[str(key)])
+                self.authors[str(key)] += [(os.path.join(dirPath, img_name), position, str(trans))]
+
         self.author_list = list(self.author_list)
         self.author_list.sort()
         
@@ -368,7 +370,7 @@ class AuthorHWDataset(Dataset):
                 if img is None:
                     print('Error, could not read image: {}'.format(img_path))
                     return None
-                img = img[lb[0]:lb[1],lb[2]:lb[3]] #read as grayscale, crop line
+                # img = img[lb[0]:lb[1],lb[2]:lb[3]] #read as grayscale, crop line
                 readNorm=False
 
 
