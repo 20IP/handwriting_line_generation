@@ -195,7 +195,7 @@ class AuthorHWDataset(Dataset):
                     img_path, lb, gt = self.authors[author][line]
                     fg_path = os.path.join(self.fg_masks_dir,'{}_{}.png'.format(author,line))
                     if not os.path.exists(fg_path):
-                        img = cv2.imread(img_path,0)[lb[0]:lb[1],lb[2]:lb[3]] #read as grayscale, crop line
+                        img = cv2.imread(img_path,0)#[lb[0]:lb[1],lb[2]:lb[3]] #read as grayscale, crop line
 
                         if img.shape[0] != self.img_height:
                             if img.shape[0] < self.img_height and not self.warning:
