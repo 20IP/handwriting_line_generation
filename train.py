@@ -14,7 +14,7 @@ from model.hw_with_style import HWWithStyle
 from hw_with_style_trainer import HWWithStyleTrainer
 from auto_trainer import AutoTrainer
 from model.autoencoder import  Autoencoder
-from code_prc.logger import Logger
+from logger import Logger
 
 
 logging.basicConfig(level=logging.INFO, format='')
