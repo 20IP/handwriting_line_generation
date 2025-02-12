@@ -193,10 +193,9 @@ class AuthorHWDataset(Dataset):
             for author,lines in self.lineIndex:
                 for line in lines:
                     img_path, lb, gt = self.authors[author][line]
-                    fg_path = os.path.join(self.fg_masks_dir,'{}_{}.png'.format(author,line))
+                    fg_path = os.path.join(self.fg_masks_dir,'{}_{}.jpg'.format(author,line))
                     if not os.path.exists(fg_path):
                         img = cv2.imread(img_path,0)#[lb[0]:lb[1],lb[2]:lb[3]] #read as grayscale, crop line
-
                         if img.shape[0] != self.img_height:
                             if img.shape[0] < self.img_height and not self.warning:
                                 self.warning = True
@@ -211,10 +210,10 @@ class AuthorHWDataset(Dataset):
 
                         th,binarized = cv2.threshold(img,0,255,cv2.THRESH_BINARY+cv2.THRESH_OTSU)
                         binarized = 255-binarized
-                        ele = cv2.getStructuringElement(  cv2.MORPH_ELLIPSE, (9,9) )
+                        ele = cv2.getStructuringElement(  cv2.MORPH_ELLIPSE, (5,5) )
                         binarized = cv2.dilate(binarized,ele)
                         cv2.imwrite(fg_path,binarized)
-                        print('saved fg mask: {}'.format(fg_path))
+                        # print('saved fg mask: {}'.format(fg_path))
                         #test_path = os.path.join(fg_masks_dir,'{}_{}_test.png'.format(author,line))
                         ##print(img.shape)
                         #img = np.stack((img,img,img),axis=2)
@@ -363,7 +362,7 @@ class AuthorHWDataset(Dataset):
             if self.no_spaces:
                 gt = gt.replace(' ','')
             if type(self.augmentation) is str and 'normalization' in  self.augmentation and self.normalized_dir is not None and os.path.exists(os.path.join(self.normalized_dir,'{}_{}.png'.format(author,line))):
-                img = cv2.imread(os.path.join(self.normalized_dir,'{}_{}.png'.format(author,line)),0)
+                img = cv2.imread(os.path.join(self.normalized_dir,'{}_{}.jpg'.format(author,line)),0)
                 readNorm=True
             else:
                 img = cv2.imread(img_path,0)
@@ -401,14 +400,14 @@ class AuthorHWDataset(Dataset):
 
         for line,gt,img,author in images:
             if self.fg_masks_dir is not None:
-                fg_path = os.path.join(self.fg_masks_dir,'{}_{}.png'.format(author,line))
+                fg_path = os.path.join(self.fg_masks_dir,'{}_{}.jpg'.format(author,line))
                 fg_mask = cv2.imread(fg_path,0)
                 fg_mask = fg_mask/255
                 if fg_mask.shape!=img[:,:].shape:
                     print('Error, fg_mask ({}, {}) not the same size as image ({}) Fixed!!'.format(fg_path,fg_mask.shape,img[:,:].shape))
                     th,fg_mask = cv2.threshold(img,0,255,cv2.THRESH_BINARY+cv2.THRESH_OTSU)
                     fg_mask = 255-fg_mask
-                    ele = cv2.getStructuringElement(  cv2.MORPH_ELLIPSE, (9,9) )
+                    ele = cv2.getStructuringElement(  cv2.MORPH_ELLIPSE, (5,5) )
                     fg_mask = cv2.dilate(fg_mask,ele)
                     fg_mask = fg_mask/255                    
             else:
