@@ -87,10 +87,9 @@ class HWDataset(Dataset):
                 img_name = select_key_df['image'][idx]
 
                 if position != None:
-                    authorLines = len(self.authors[str(key)])
-                    self.authors[str(key)] += [(os.path.join(dirPath, img_name), position, str(trans))]
-                    self.lineIndex += [(str(key),idx)]
-        
+                    authorLines = len(self.authors[str(key)+split])
+                    self.authors[str(key)+split] += [(os.path.join(dirPath, img_name), position, str(trans))]
+                    self.lineIndex += [(str(key)+split,idx)]
         
         char_set_path = config['char_file']
         with open(char_set_path) as f:
@@ -117,14 +116,14 @@ class HWDataset(Dataset):
     def __getitem__(self, idx):
         author,line = self.lineIndex[idx]
         img_path, lb, gt = self.authors[author][line]
-        # ic(img_path)
+        
         if self.add_spaces:
             gt = ' '+gt+' '
         if type(self.augmentation) is str and 'normalization' in  self.augmentation and self.normalized_dir is not None and os.path.exists(os.path.join(self.normalized_dir,'{}_{}.png'.format(author,line))):
-            img = cv2.imread(os.path.join(self.normalized_dir,'{}_{}.png'.format(author,line)),0)
+            img = cv2.imread(os.path.join(self.normalized_dir,'{}_{}.jpg'.format(author,line)),0)
             readNorm=True
         else:
-            img = cv2.imread(img_path,0)#[lb[0]:lb[1],lb[2]:lb[3]] #read as grayscale, crop line
+            img = cv2.imread(img_path,0)
             readNorm=False
 
         if img is None:
@@ -135,17 +134,17 @@ class HWDataset(Dataset):
                 print("WARNING: upsampling image to fit size")
             percent = float(self.img_height) / img.shape[0]
             img = cv2.resize(img, (0,0), fx=percent, fy=percent, interpolation = cv2.INTER_CUBIC)
-        # cv2.imwrite(f'kb-{os.path.basename(img_path)}', img)
+        
         if img is None:
             return None
-        # print('image--shape', img.shape)
+        
         if len(img.shape)==2:
             img = img[...,None]
         if type(self.augmentation) is str and 'normalization' in  self.augmentation and not readNorm:
             img = normalize_line.deskew(img)
             img = normalize_line.skeletonize(img)
             if self.normalized_dir is not None:
-                cv2.imwrite(os.path.join(self.normalized_dir,'{}_{}.png'.format(author,line)),img)
+                cv2.imwrite(os.path.join(self.normalized_dir,'{}_{}.jpg'.format(author,line)),img)
         elif self.augmentation is not None and (type(self.augmentation) is not str or 'warp' in self.augmentation):
             #img = augmentation.apply_random_color_rotation(img)
             if type(self.augmentation) is str and "low" in self.augmentation:
