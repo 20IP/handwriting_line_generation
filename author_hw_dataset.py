@@ -20,7 +20,72 @@ from util import makeMask
 import itertools, pickle
 
 import random
+
 PADDING_CONSTANT = -1
+
+import cv2
+import numpy as np
+
+import cv2
+import numpy as np
+
+def resize_image_optimized(img, target_height=64, max_width=None):
+    """
+    Resize an image to a fixed height while maintaining the aspect ratio.
+    Ensures that the output is always modified and valid.
+    
+    Parameters:
+    - img: Input image (numpy array)
+    - target_height: Target height (default: 64)
+    - max_width: Maximum allowed width (optional)
+    
+    Returns:
+    - Resized image with correct aspect ratio
+    """
+
+    # Kiểm tra input có hợp lệ không
+    if img is None or not isinstance(img, np.ndarray):
+        raise ValueError("Input image is invalid or not a numpy array.")
+    
+    h, w = img.shape[:2]
+
+    # Tránh trường hợp ảnh đầu vào có kích thước bất thường
+    if h <= 0 or w <= 0:
+        raise ValueError(f"Invalid image dimensions: {h}x{w}")
+
+    # Tính toán tỉ lệ scale dựa trên chiều cao
+    scale = target_height / h
+    new_width = int(w * scale)
+
+    # Kiểm tra nếu max_width được đặt, đảm bảo không vượt quá
+    if max_width and new_width > max_width:
+        scale = max_width / w
+        new_width = max_width
+        target_height = int(h * scale)  # Cập nhật chiều cao theo tỷ lệ
+
+    # Chọn phương pháp nội suy thích hợp
+    interpolation = cv2.INTER_CUBIC if h < target_height else cv2.INTER_AREA
+
+    # Resize ảnh
+    resized_img = cv2.resize(img, (new_width, target_height), interpolation=interpolation)
+
+    # Kiểm tra nếu resize có thành công không
+    if resized_img.shape[0] <= 0 or resized_img.shape[1] <= 0:
+        raise RuntimeError("Resized image has invalid dimensions.")
+
+    # Nếu chiều cao sau resize chưa đạt target_height, thêm padding
+    if resized_img.shape[0] < target_height:
+        diff = target_height - resized_img.shape[0]
+        resized_img = np.pad(resized_img, ((diff//2, diff//2 + diff%2), (0, 0)), 
+                             mode='constant', constant_values=255)  # Padding màu trắng
+
+    # Đảm bảo ảnh đầu ra luôn hợp lệ
+    if resized_img.shape[0] != target_height:
+        raise RuntimeError(f"Final image height incorrect: {resized_img.shape[0]} instead of {target_height}")
+    
+    return resized_img
+
+
 def nCr(n,r):
     f = math.factorial
     return f(n) // f(r) // f(n-r)
@@ -141,61 +206,50 @@ class AuthorHWDataset(Dataset):
         for page_idx, key in enumerate(unikey):
             select_key_df = data_df[data_df['author'] == key]
             select_key_df.reset_index(inplace=True, drop=True)
-            # ic(select_key_df.shape)
             for idx in range(select_key_df.shape[0]):
                 position = json.loads(select_key_df['pos'][idx])        # position rectangle
                 trans = select_key_df['lbls'][idx]                      # text labels
                 img_name = select_key_df['image'][idx]                  # image name, author = key
             
-                self.author_list.add(str(key))
+                self.author_list.add(str(key)+split)
                 if only_author is not None and type(only_author) is int and page_idx==only_author:
-                    only_author=str(key)
+                    only_author=str(key)+split
                     print('Only author: {}'.format(only_author))
-                if only_author is not None and str(key)!=only_author:
+                if only_author is not None and str(key)+split!=only_author:
                     continue
-                if skip_author is not None and str(key)==skip_author:
+                if skip_author is not None and str(key)+split==skip_author:
                     continue
                 self.max_char_len= max([self.max_char_len]+[len(str(trans))])
                 
-                authorLines = len(self.authors[str(key)])
-                self.authors[str(key)] += [(os.path.join(dirPath, img_name), position, str(trans))]
-
+                authorLines = len(self.authors[str(key)+split])
+                self.authors[str(key)+split] += [(os.path.join(dirPath, img_name), position, str(trans))]
         self.author_list = list(self.author_list)
         self.author_list.sort()
-        
         short = config['short'] if 'short' in config else False
+        
         for author,lines in self.authors.items():
-            for i in range(len(lines)//self.batch_size):
-                ls=[]
-                for n in range(self.batch_size):
-                    ls.append(self.batch_size*i+n)
-                inst = (author,ls)
-                self.lineIndex.append(inst)
-                if short and i>=short:
-                    break
-            if short and i>=short:
-                continue
-            leftover = len(lines)%self.batch_size
-            fill = self.batch_size-leftover
-            last=[]
-            for i in range(fill):
-                last.append(i)
-            for i in range(leftover):
-                last.append(len(lines)-(1+i))
-            self.lineIndex.append((author,last))
+            tt_index = list(range(len(lines)))
+            reduce = len(lines)%self.batch_size
+            leftover = random.choices(tt_index, k=reduce)
+            tt_index += leftover
+            random.shuffle(tt_index)
+            self.lineIndex += [(author, tt_index[i:i+self.batch_size]) for i in range(0, len(tt_index) - 1, self.batch_size)]
+            
         self.fg_masks_dir = config['fg_masks_dir'] if 'fg_masks_dir' in config else None
+        # self.fg_masks_dir = ../data/Cyrillic/mask
 
         if self.fg_masks_dir is not None:
             if self.fg_masks_dir[-1]=='/':
                 self.fg_masks_dir = self.fg_masks_dir[:-1]
-            self.fg_masks_dir+='_{}'.format(self.max_width)
+            self.fg_masks_dir+='_{}'.format(self.max_width) # = ../data/Cyrillic/mask_1300
             ensure_dir(self.fg_masks_dir)
+
             for author,lines in self.lineIndex:
                 for line in lines:
                     img_path, lb, gt = self.authors[author][line]
                     fg_path = os.path.join(self.fg_masks_dir,'{}_{}.jpg'.format(author,line))
                     if not os.path.exists(fg_path):
-                        img = cv2.imread(img_path,0)#[lb[0]:lb[1],lb[2]:lb[3]] #read as grayscale, crop line
+                        img = cv2.imread(img_path,0)
                         if img.shape[0] != self.img_height:
                             if img.shape[0] < self.img_height and not self.warning:
                                 self.warning = True
@@ -208,24 +262,21 @@ class AuthorHWDataset(Dataset):
                                 diff = self.img_height-img.shape[0]
                                 img = np.pad(img,((diff//2,diff//2+diff%2),(0,0)),'constant',constant_values=255)
 
-                        th,binarized = cv2.threshold(img,0,255,cv2.THRESH_BINARY+cv2.THRESH_OTSU)
+                        _,binarized = cv2.threshold(img,0,255,cv2.THRESH_BINARY+cv2.THRESH_OTSU)
                         binarized = 255-binarized
                         ele = cv2.getStructuringElement(  cv2.MORPH_ELLIPSE, (5,5) )
                         binarized = cv2.dilate(binarized,ele)
                         cv2.imwrite(fg_path,binarized)
-                        # print('saved fg mask: {}'.format(fg_path))
-                        #test_path = os.path.join(fg_masks_dir,'{}_{}_test.png'.format(author,line))
-                        ##print(img.shape)
-                        #img = np.stack((img,img,img),axis=2)
-                        #img[:,:,0]=binarized
-                        #cv2.imwrite(test_path,img)
-                        #print('saved fg mask: {}'.format(fg_path))
+                    else:
+                        pass
+                        # print('Exited!!!')
+                        # ic(author,line)
+                        # ic('Path Exited!!!')
 
             #if split=='train':
             #    ss = set(self.lineIndex)
         #self.authors = self.authors.keys()
                 
-
         char_set_path = config['char_file']
         with open(char_set_path) as f:
             char_set = json.load(f)
@@ -317,16 +368,16 @@ class AuthorHWDataset(Dataset):
                     lines += lines[:dif]
                 alines += [(author,l) for l in lines]
         else:
-
-
+            
             inst = self.lineIndex[idx]
             author=inst[0]
-            lines=inst[1]
+            lines=inst[1]    # [3996, 4331]
 
-
-            alines = [(author,l) for l in lines]
+            alines = [(author,l) for l in lines]   #  = so luong elements = self.batch_size
             used_lines = set(lines)
+
             if self.triplet:
+                ## Not going here
                 if len(self.authors[author])<=2*self.batch_size:
                     for l in range(len(self.authors[author])):
                         if l not in used_lines:
@@ -351,12 +402,12 @@ class AuthorHWDataset(Dataset):
                     unused_lines.remove(l)
                     alines.append((author,l))
 
-            
 
         images=[]
         for author,line in alines:
             if line>=len(self.authors[author]):
                 line = (line+37)%len(self.authors[author])
+
             img_path, lb, gt = self.authors[author][line]
 
             if self.no_spaces:
@@ -398,7 +449,7 @@ class AuthorHWDataset(Dataset):
             #we split the processing here so that strech will be adjusted for longest image in author batch
 
 
-        for line,gt,img,author in images:
+        for idx, (line,gt,img,author) in enumerate(images):
             if self.fg_masks_dir is not None:
                 fg_path = os.path.join(self.fg_masks_dir,'{}_{}.jpg'.format(author,line))
                 fg_mask = cv2.imread(fg_path,0)
@@ -418,7 +469,7 @@ class AuthorHWDataset(Dataset):
                 img = normalize_line.deskew(img)
                 img = normalize_line.skeletonize(img)
                 if self.normalized_dir is not None:
-                    cv2.imwrite(os.path.join(self.normalized_dir,'{}_{}.png'.format(author,line)),img)
+                    cv2.imwrite(os.path.join(self.normalized_dir,'{}_{}.jpg'.format(author,line)),img)
             if type(self.augmentation) is str and 'affine' in  self.augmentation:
                 img,fg_mask = augmentation.affine_trans(img,fg_mask,skew,strech)
             elif self.augmentation is not None and (type(self.augmentation) is not None or 'warp' in self.augmentation):
@@ -482,7 +533,7 @@ class AuthorHWDataset(Dataset):
             if self.include_stroke_aug:
                 toAppend['changed_image'] = new_img
             batch.append(toAppend)
-            
+        # while True:pass
         #batch = [b for b in batch if b is not None]
         #These all should be the same size or error
         assert len(set([b['image'].shape[0] for b in batch])) == 1
