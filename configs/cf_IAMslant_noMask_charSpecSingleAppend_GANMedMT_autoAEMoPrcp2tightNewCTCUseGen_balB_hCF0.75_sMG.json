@@ -41,7 +41,7 @@
     },
     "optimizer_type_discriminator": "Adam",
     "optimizer_discriminator": {
-        "lr": 0.0001,
+        "lr": 0.0002,
         "weight_decay": 0,
         "betas": [0.5,0.999]
     },
@@ -54,12 +54,12 @@
     },
     "loss_weights": {
         "auto": 0.5,
-        "perceptual": 0.7,
+        "perceptual": 0.5,
         "count": 0.5,
         "reconRecog": 0.000001,
         "genRecog": 0.0001,
-        "discriminator": 0.75,
-        "generator": 1.5
+        "discriminator": 1,
+        "generator": 1
 
     },
     "loss_params":
@@ -72,7 +72,7 @@
         "iterations": 175000,
         "save_dir": "../saved_style_3/",
         "val_step": 10000,
-        "save_step": 25000,
+        "save_step": 10000,
         "save_step_minor": 250,
         "log_step": 250,
         "verbosity": 1,
@@ -90,12 +90,13 @@
                         ["auto","auto-gen"],
                         ["disc"],
                         ["no-step","gen"],
-                        ["auto","auto-gen"]
+                        ["auto","auto-gen"],
+                        ["disc"]
 
                     ] 
         },
-        "new_gen_freq": 0.9,
-        "forget_new_freq": 0.85,
+        "new_gen_freq": 0.8,
+        "forget_new_freq": 0.95,
         "balance_loss": "sign_preserve_var",
         "balance_var_x": {"0":[0.6,0.5,0.4,0.75]},
 
@@ -104,7 +105,7 @@
         "use_learning_schedule": false,
         "no_bg_loss": true,
 
-        "encoder_weights": "/home/datateam/projects/GEN_Handwritten/saved_style_02/IAM_auto_2tight_newCTC/checkpoint-iteration40000.pth",
+        "encoder_weights": "/home/datateam/projects/GEN_Handwritten/saved_style_02/IAM_auto_2tight_newCTC/checkpoint-iteration45000.pth",
         "encoder_type": "2tight",
 
         "print_dir": "train_out/IAMslant_noMask_charSpecSingleAppend_GANMedMT_autoAEMoPrcp2tightNewCTCUseGen_balB_hCF0.75_sMG",
@@ -116,7 +117,7 @@
         "num_class": 112,
         "generator": "PureGen",
         "gen_append_style": true,
-        "gen_dim": 256,
+        "gen_dim": 512,
         "gen_use_skips": true,
 	"hwr": "CNNOnly batchnorm",
         "pretrained_hwr": "/home/datateam/projects/GEN_Handwritten/saved_style_01/IAM_hwr_cnnOnly_batchnorm_aug/checkpoint-iteration80000.pth",
@@ -127,7 +128,7 @@
         "style": "char",
         "style_norm":"group",
         "style_activ":"relu",
-        "style_dim": 128,
+        "style_dim": 256,
         "char_style_dim": 0,
         "char_style_window": 2,
         "average_found_char_style": 1.0,
